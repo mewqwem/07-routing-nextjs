@@ -1,29 +1,28 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
-import { fetchNoteById } from "@/lib/api";
+import Modal from "@/components/Modal/Modal";
 import NotePreview from "@/components/NotePreview/NotePreview";
-import { useRouter } from "next/router";
+import { fetchNoteById } from "@/lib/api";
+import { useQuery } from "@tanstack/react-query";
+import { useParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import css from "@/components/NotePreview/NotePreview.module.css";
 
-interface NoteDetailsClientProps {
-  id: string;
-}
-
-export default function NoteDetailsClient({ id }: NoteDetailsClientProps) {
+export default function NotePreviewClient() {
   const router = useRouter();
 
   const handleClose = () => {
     router.back();
   };
+  const { id } = useParams<{ id: string }>();
+
   const {
     data: note,
-    isLoading,
     isError,
+    isLoading,
   } = useQuery({
     queryKey: ["getNote", id],
     queryFn: () => fetchNoteById(id),
-    staleTime: 60 * 1000,
     refetchOnMount: false,
   });
 
@@ -31,11 +30,11 @@ export default function NoteDetailsClient({ id }: NoteDetailsClientProps) {
   if (isError || !note) return <p>Something went wrong.</p>;
 
   return (
-    <>
+    <Modal onClose={handleClose}>
       <button className={css.backBtn} onClick={handleClose}>
         Close
       </button>
       {note && <NotePreview note={note} />}
-    </>
+    </Modal>
   );
 }

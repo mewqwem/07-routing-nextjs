@@ -13,15 +13,21 @@ import Modal from "@/components/Modal/Modal";
 import NoteForm from "@/components/NoteForm/NoteForm";
 import css from "./App.module.css";
 
-export default function NotesClient() {
+interface NotesClientProps {
+  tag?: string[];
+}
+
+export default function NotesClient({ tag }: NotesClientProps) {
   const [page, setPage] = useState<number>(1);
   const [searchValue, setSearchValue] = useState<string>("");
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const perPage = 12;
+  const tagValue = tag?.[0];
+  const currentTag = tagValue === "all" ? undefined : tagValue;
 
   const { data, isError, isLoading, isFetching } = useQuery({
-    queryKey: ["getNotes", searchValue, page],
-    queryFn: () => getNotes(searchValue, page, perPage),
+    queryKey: ["getNotes", searchValue, page, currentTag],
+    queryFn: () => getNotes(searchValue, page, perPage, currentTag),
     placeholderData: keepPreviousData,
     staleTime: 60 * 1000,
   });
